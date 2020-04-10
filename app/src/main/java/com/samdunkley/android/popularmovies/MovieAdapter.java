@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.samdunkley.android.popularmovies.model.MovieDetails;
+import com.samdunkley.android.popularmovies.utils.ApiUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -31,7 +32,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MoviePosterHolder> {
     public void onBindViewHolder(@NonNull MoviePosterHolder holder, int position) {
         MovieDetails movieDetails = movieData.get(position);
         ImageView posterIv = holder.posterIv;
-        Picasso.with(posterIv.getContext()).load(movieDetails.getPosterUrl()).into(posterIv);
+
+        Picasso.get().load(movieDetails.getPosterUrl()).into(posterIv);
     }
 
     @Override
@@ -39,7 +41,4 @@ public class MovieAdapter extends RecyclerView.Adapter<MoviePosterHolder> {
         return movieData.size();
     }
 
-    public void setMovieData(List<MovieDetails> movieData) {
-        this.movieData = movieData;
-    }
 }

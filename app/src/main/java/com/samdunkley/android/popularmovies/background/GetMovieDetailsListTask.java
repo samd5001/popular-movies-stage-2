@@ -1,5 +1,6 @@
 package com.samdunkley.android.popularmovies.background;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import com.samdunkley.android.popularmovies.MovieAdapter;
@@ -14,17 +15,19 @@ public class GetMovieDetailsListTask extends AsyncTask<String, Void, List<MovieD
     private String sortOrder;
     private MovieAdapter movieAdapter;
     private ArrayList<MovieDetails> movieDetailsList;
+    private Context context;
 
-    public GetMovieDetailsListTask(String sortOrder, MovieAdapter movieAdapter, ArrayList<MovieDetails> movieDetailsList) {
+    public GetMovieDetailsListTask(String sortOrder, MovieAdapter movieAdapter, ArrayList<MovieDetails> movieDetailsList, Context context) {
         this.movieAdapter = movieAdapter;
         this.sortOrder = sortOrder;
         this.movieDetailsList = movieDetailsList;
+        this.context = context;
     }
 
     @Override
     protected List<MovieDetails> doInBackground(String... strings) {
 
-        return ApiUtils.fetchMovies(this.sortOrder);
+        return ApiUtils.fetchMovies(this.sortOrder, this.context);
     }
 
     @Override

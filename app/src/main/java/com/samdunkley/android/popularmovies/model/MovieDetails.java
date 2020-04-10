@@ -6,7 +6,7 @@ import android.os.Parcelable;
 public class MovieDetails implements Parcelable {
 
     public static final String TITLE = "title";
-    public static final String POSTER_URL = "poster_path";
+    public static final String POSTER_PATH = "poster_path";
     public static final String SYNOPSIS = "overview";
     public static final String RATING = "vote_average";
     public static final String RELEASE_DATE = "release_date";
