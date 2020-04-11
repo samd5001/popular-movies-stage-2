@@ -111,18 +111,18 @@ public class MainActivity extends AppCompatActivity {
 
         String queryPath = getSortPathFromPreferences();
 
-        if (ApiUtils.isOnline(this.getApplicationContext())) {
-            getAndSetMovies(queryPath);
-        } else {
-            Toast.makeText(this.getApplicationContext(), "No network connection available", Toast.LENGTH_LONG);
-        }
+        getAndSetMovies(queryPath);
 
         super.onStart();
     }
 
     private void getAndSetMovies(String queryPath) {
-        GetMovieDetailsListTask movieTask = new GetMovieDetailsListTask(queryPath, this.movieAdapter, this.movieDetailsList, this.getApplicationContext());
-        movieTask.execute();
+        if (ApiUtils.isOnline(this.getApplicationContext())) {
+            GetMovieDetailsListTask movieTask = new GetMovieDetailsListTask(queryPath, this.movieAdapter, this.movieDetailsList, this.getApplicationContext());
+            movieTask.execute();
+        } else {
+            Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
+        }
     }
 
     private String getSortPathFromPreferences() {
