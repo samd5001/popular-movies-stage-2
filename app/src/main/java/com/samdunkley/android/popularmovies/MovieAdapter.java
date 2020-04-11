@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.samdunkley.android.popularmovies.model.MovieDetails;
-import com.samdunkley.android.popularmovies.utils.ApiUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

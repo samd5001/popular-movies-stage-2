@@ -1,9 +1,11 @@
 package com.samdunkley.android.popularmovies;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     private MovieAdapter movieAdapter;
     private ArrayList<MovieDetails> movieDetailsList;
-    private SharedPreferences prefs ;
+    private SharedPreferences prefs;
 
 
     @Override
@@ -93,6 +95,13 @@ public class MainActivity extends AppCompatActivity {
         movieAdapter = new MovieAdapter(movieDetailsList);
         recyclerView.setAdapter(movieAdapter);
 
+        recyclerView.addOnItemTouchListener(new MovieTouchListener(this.getApplicationContext(), recyclerView, new MovieTouchListener.OnItemTouchListener() {
+                    @Override
+                    public void onItemTouch(View view, int position) {
+                        launchDetailActivity(movieDetailsList.get(position));
+                    }
+                })
+        );
     }
 
     @Override
@@ -118,5 +127,11 @@ public class MainActivity extends AppCompatActivity {
 
     private String getSortPathFromPreferences() {
         return prefs.getString(SORT_PREFERENCE_KEY, POPULAR_API_PATH);
+    }
+
+    private void launchDetailActivity(MovieDetails movie) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
+        startActivity(intent);
     }
 }

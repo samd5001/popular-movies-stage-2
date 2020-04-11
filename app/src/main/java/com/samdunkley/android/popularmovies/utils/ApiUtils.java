@@ -1,13 +1,17 @@
 package com.samdunkley.android.popularmovies.utils;
 
 import android.content.Context;
-import android.graphics.Movie;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 
 import com.samdunkley.android.popularmovies.R;
 import com.samdunkley.android.popularmovies.model.MovieDetails;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -15,9 +19,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ApiUtils {
     private static final String API_KEY_NAME = "api_key";
@@ -90,7 +91,7 @@ public class ApiUtils {
     }
 
     public static boolean isOnline(Context paramContext) {
-        NetworkInfo networkInfo = ((ConnectivityManager)paramContext.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        NetworkInfo networkInfo = ((ConnectivityManager) paramContext.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnectedOrConnecting());
     }
 }
