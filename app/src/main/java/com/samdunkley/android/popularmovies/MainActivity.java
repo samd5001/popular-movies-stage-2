@@ -3,38 +3,43 @@ package com.samdunkley.android.popularmovies;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.samdunkley.android.popularmovies.background.GetMovieDetailsListTask;
 import com.samdunkley.android.popularmovies.model.MovieDetails;
+import com.samdunkley.android.popularmovies.model.MovieFavourite;
 import com.samdunkley.android.popularmovies.utils.ApiUtils;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static String MOVIES_STATE_KEY = "movie_details";
-    private static String SORT_PREFERENCE_KEY = "sortOrder";
-    private static String POPULAR_API_PATH = "popular";
-    private static String TOP_RATED_API_PATH = "top_rated";
+    private static final String MOVIES_STATE_KEY = "movie_details";
+    private static final String FAVOURITES_STATE_KEY = "favourites_details";
+    private static final String SORT_PREFERENCE_KEY = "sortOrder";
+    private static final String POPULAR_API_PATH = "popular";
+    private static final String TOP_RATED_API_PATH = "top_rated";
+    private static final String FAVOURITES = "favourites";
 
-    private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
     private MovieAdapter movieAdapter;
     private ArrayList<MovieDetails> movieDetailsList;
-    private SharedPreferences prefs;
+    private ArrayList<MovieFavourite> movieFavouritesList;
 
+    private SharedPreferences prefs;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList(MOVIES_STATE_KEY, movieDetailsList);
+        outState.putParcelableArrayList(FAVOURITES_STATE_KEY, movieFavouritesList);
         super.onSaveInstanceState(outState);
     }
 
@@ -46,50 +51,62 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem sortOrder = menu.findItem(R.id.pref_sort_order);
-
-        if (getSortPathFromPreferences() == POPULAR_API_PATH) {
-            sortOrder.setTitle(R.string.sort_order_popular);
-        } else {
-            sortOrder.setTitle(R.string.sort_order_top_rated);
+        switch (getSortPathFromPreferences()) {
+            case POPULAR_API_PATH:
+                MenuItem popular = menu.findItem(R.id.pref_sort_popular);
+                popular.setChecked(true);
+                break;
+            case TOP_RATED_API_PATH:
+                MenuItem topRated = menu.findItem(R.id.pref_sort_highest);
+                topRated.setChecked(true);
+                break;
+            case FAVOURITES:
+                MenuItem favourites = menu.findItem(R.id.pref_sort_favourite);
+                favourites.setChecked(true);
+                break;
         }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        item.setChecked(true);
+
         switch (item.getItemId()) {
-            case R.id.pref_sort_order:
-                if (getSortPathFromPreferences() == POPULAR_API_PATH) {
-                    getAndSetMovies(TOP_RATED_API_PATH);
-                    prefs.edit().putString(SORT_PREFERENCE_KEY, TOP_RATED_API_PATH).commit();
-                } else {
-                    getAndSetMovies(POPULAR_API_PATH);
-                    prefs.edit().putString(SORT_PREFERENCE_KEY, POPULAR_API_PATH).commit();
-                }
-                return true;
+            case R.id.pref_sort_popular:
+                return handleOptionClick(POPULAR_API_PATH);
+            case R.id.pref_sort_highest:
+                return handleOptionClick(TOP_RATED_API_PATH);
+            case R.id.pref_sort_favourite:
+                return handleOptionClick(FAVOURITES);
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean handleOptionClick(String sortOrder) {
+        if (FAVOURITES.equals(sortOrder)) {
+            setMoviesFromDB();
+        } else {
+            getAndSetMoviesFromApi(sortOrder);
+        }
+        prefs.edit().putString(SORT_PREFERENCE_KEY, sortOrder).commit();
+        return true;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIES_STATE_KEY)) {
-            movieDetailsList = new ArrayList<>();
-        } else {
-            movieDetailsList = savedInstanceState.getParcelableArrayList(MOVIES_STATE_KEY);
-        }
+        loadFromSavedInstanceState(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-        recyclerView = findViewById(R.id.movie_rv);
+        RecyclerView recyclerView = findViewById(R.id.movie_rv);
 
         recyclerView.setHasFixedSize(true);
 
-        layoutManager = new GridLayoutManager(this, 2);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
 
         movieAdapter = new MovieAdapter(movieDetailsList);
@@ -98,7 +115,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new MovieTouchListener(this.getApplicationContext(), recyclerView, new MovieTouchListener.OnItemTouchListener() {
                     @Override
                     public void onItemTouch(View view, int position) {
-                        launchDetailActivity(movieDetailsList.get(position));
+                        if (FAVOURITES.equals(getSortPathFromPreferences())) {
+                            launchDetailActivity(movieFavouritesList.get(position));
+                        } else {
+                            launchDetailActivity(movieDetailsList.get(position));
+                        }
                     }
                 })
         );
@@ -111,12 +132,16 @@ public class MainActivity extends AppCompatActivity {
 
         String queryPath = getSortPathFromPreferences();
 
-        getAndSetMovies(queryPath);
+        if (!FAVOURITES.equals(queryPath)) {
+            getAndSetMoviesFromApi(queryPath);
+        }
+
+        setupFavouritesViewModel();
 
         super.onStart();
     }
 
-    private void getAndSetMovies(String queryPath) {
+    private void getAndSetMoviesFromApi(String queryPath) {
         if (ApiUtils.isOnline(this.getApplicationContext())) {
             GetMovieDetailsListTask movieTask = new GetMovieDetailsListTask(queryPath, this.movieAdapter, this.movieDetailsList, this.getApplicationContext());
             movieTask.execute();
@@ -134,4 +159,53 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
         startActivity(intent);
     }
+
+    private void launchDetailActivity(MovieFavourite movie) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_FAVOURITE, movie);
+        startActivity(intent);
+    }
+
+    private void setupFavouritesViewModel() {
+        FavouritesViewModel viewModel = new ViewModelProvider(this).get(FavouritesViewModel.class);
+        viewModel.getFavourites().observe(this, favourites -> {
+            movieFavouritesList.clear();
+
+            movieFavouritesList.addAll(favourites);
+
+            String queryPath = getSortPathFromPreferences();
+
+            if (FAVOURITES.equals(queryPath)) {
+                setMoviesFromDB();
+            }
+        });
+    }
+
+    private void setMoviesFromDB() {
+        movieDetailsList.clear();
+        for (MovieFavourite favourite : movieFavouritesList) {
+            movieDetailsList.add(new MovieDetails(favourite.getId(), favourite.getTitle(), favourite.getPosterPath(), null, null, null));
+        }
+        movieAdapter.notifyDataSetChanged();
+    }
+
+    private void loadFromSavedInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            movieDetailsList = new ArrayList<>();
+            movieFavouritesList = new ArrayList<>();
+        } else {
+            populateStateArray(savedInstanceState, MOVIES_STATE_KEY, movieDetailsList);
+            populateStateArray(savedInstanceState, FAVOURITES_STATE_KEY, movieFavouritesList);
+        }
+    }
+
+    private <T extends Parcelable> ArrayList<T> populateStateArray(Bundle savedInstanceState, String stateKey, ArrayList<T> movieList) {
+        if (!savedInstanceState.containsKey(stateKey)) {
+            movieList = new ArrayList<>();
+        } else {
+            movieList = savedInstanceState.getParcelableArrayList(stateKey);
+        }
+        return movieList;
+    }
+
 }

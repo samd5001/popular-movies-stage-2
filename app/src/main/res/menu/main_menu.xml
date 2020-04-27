@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/pref_sort_order"
-        android:title="@string/sort_order_popular"
-        app:showAsAction="never" />
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/pref_sort_popular"
+            android:title="@string/sort_order_popular"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/pref_sort_highest"
+            android:title="@string/sort_order_top_rated"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/pref_sort_favourite"
+            android:title="@string/sort_order_favourites"
+            app:showAsAction="never" />
+    </group>
 </menu>

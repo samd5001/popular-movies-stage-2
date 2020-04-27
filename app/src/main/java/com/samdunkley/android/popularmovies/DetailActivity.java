@@ -2,19 +2,34 @@ package com.samdunkley.android.popularmovies;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.samdunkley.android.popularmovies.background.DBExecutors;
+import com.samdunkley.android.popularmovies.db.MovieFavouriteDatabase;
 import com.samdunkley.android.popularmovies.model.MovieDetails;
+import com.samdunkley.android.popularmovies.model.MovieFavourite;
+import com.samdunkley.android.popularmovies.utils.ApiUtils;
 import com.samdunkley.android.popularmovies.utils.DateUtils;
 import com.squareup.picasso.Picasso;
 
 public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_MOVIE = "extra_movie";
+    public static final String EXTRA_FAVOURITE = "extra_favourite";
+
+    private MovieFavouriteDatabase favouriteDb;
+
+    private MovieDetails movieDetails;
+
+    public void setMovieDetails(MovieDetails movieDetails) {
+        this.movieDetails = movieDetails;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,18 +39,34 @@ public class DetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        if (intent == null) {
+        boolean hasMov = intent.hasExtra(EXTRA_MOVIE);
+        boolean hasFav = intent.hasExtra(EXTRA_FAVOURITE);
+
+        if (intent == null || (!intent.hasExtra((EXTRA_MOVIE)) && !intent.hasExtra((EXTRA_FAVOURITE)))) {
             closeOnError();
         }
 
-        MovieDetails movie = intent.getParcelableExtra(EXTRA_MOVIE);
+        favouriteDb = MovieFavouriteDatabase.getInstance(getApplicationContext());
 
-        if (movie == null) {
-            closeOnError();
+        movieDetails = intent.getParcelableExtra(EXTRA_MOVIE);
+
+        if (movieDetails != null) {
+            populateUI();
+            setupFavouriteButton(false);
             return;
         }
 
-        populateUI(movie);
+        MovieFavourite favourite = intent.getParcelableExtra(EXTRA_FAVOURITE);
+
+        if (favourite != null) {
+            setTitleAndPoster(favourite.getTitle(), favourite.getPosterPath());
+            ApiUtils.fetchMovieAndPopulateUI(favourite.getId().toString(), this);
+            setupFavouriteButton(true);
+            return;
+        }
+
+        closeOnError();
+
     }
 
     private void closeOnError() {
@@ -43,22 +74,61 @@ public class DetailActivity extends AppCompatActivity {
         Toast.makeText(this, R.string.detail_open_error_message, Toast.LENGTH_SHORT).show();
     }
 
-    private void populateUI(MovieDetails movie) {
+    public void populateUI() {
 
-        TextView titleTv = findViewById(R.id.detail_title_tv);
-        titleTv.setText(movie.getTitle());
-
-        ImageView thumbnailIv = findViewById(R.id.detail_thumbnail_iv);
-        Picasso.get().load(movie.getPosterUrl()).into(thumbnailIv);
+        setTitleAndPoster(movieDetails.getTitle(), movieDetails.getPosterUrl());
 
         TextView releaseDateTv = findViewById(R.id.detail_release_tv);
-        releaseDateTv.setText(DateUtils.getYearFromDateString(movie.getReleaseDate(), this));
+        releaseDateTv.setText(DateUtils.getYearFromDateString(movieDetails.getReleaseDate(), this));
 
         TextView ratingTv = findViewById(R.id.detail_rating_tv);
-        ratingTv.setText(getApplicationContext().getString(R.string.detail_rating_template, movie.getRating().toString()));
+        ratingTv.setText(getApplicationContext().getString(R.string.detail_rating_template, movieDetails.getRating().toString()));
 
         TextView overviewTv = findViewById(R.id.detail_overview_tv);
-        overviewTv.setText(movie.getSynopsis());
+        overviewTv.setText(movieDetails.getSynopsis());
+    }
 
+    private void setTitleAndPoster(String title, String posterUrl) {
+        TextView titleTv = findViewById(R.id.detail_title_tv);
+        titleTv.setText(title);
+
+        ImageView thumbnailIv = findViewById(R.id.detail_thumbnail_iv);
+        Picasso.get().load(posterUrl).into(thumbnailIv);
+    }
+
+    private void setupFavouriteButton(boolean isFavourite) {
+        ToggleButton favouriteTb = findViewById(R.id.favourite_button);
+        favouriteTb.setChecked(isFavourite);
+        setFavouriteButton(favouriteTb, isFavourite);
+        favouriteTb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton button, boolean checked) {
+                toggleFavourite(movieDetails, checked);
+                setFavouriteButton(favouriteTb, checked);
+            }
+        });
+    }
+
+    private void setFavouriteButton(ToggleButton favouriteTb, boolean isFavourite) {
+        if (isFavourite) {
+            favouriteTb.setBackgroundResource(R.drawable.baseline_star_24);
+        } else {
+            favouriteTb.setBackgroundResource(R.drawable.baseline_star_outline_24);
+        }
+    }
+
+    private void toggleFavourite(MovieDetails movie, boolean isFavourite) {
+        MovieFavourite favourite = new MovieFavourite(movie.getId(), movie.getTitle(), movie.getPosterUrl());
+
+        DBExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (isFavourite) {
+                    favouriteDb.movieFavouriteDao().insertFavourite(favourite);
+                } else {
+                    favouriteDb.movieFavouriteDao().deleteFavourite(favourite);
+                }
+            }
+        });
     }
 }

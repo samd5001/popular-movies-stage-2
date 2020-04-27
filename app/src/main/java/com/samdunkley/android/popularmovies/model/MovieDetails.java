@@ -5,11 +5,13 @@ import android.os.Parcelable;
 
 public class MovieDetails implements Parcelable {
 
+    public static final String ID = "id";
     public static final String TITLE = "title";
     public static final String POSTER_PATH = "poster_path";
     public static final String SYNOPSIS = "overview";
     public static final String RATING = "vote_average";
     public static final String RELEASE_DATE = "release_date";
+
     public static final Creator<MovieDetails> CREATOR = new Creator<MovieDetails>() {
         @Override
         public MovieDetails createFromParcel(Parcel in) {
@@ -21,13 +23,16 @@ public class MovieDetails implements Parcelable {
             return new MovieDetails[size];
         }
     };
+
+    private Integer id;
     private String title;
     private String posterUrl;
     private String synopsis;
     private Integer rating;
     private String releaseDate;
 
-    public MovieDetails(String title, String posterUrl, String synopsis, int rating, String releaseDate) {
+    public MovieDetails(Integer id, String title, String posterUrl, String synopsis, Integer rating, String releaseDate) {
+        this.id = id;
         this.title = title;
         this.posterUrl = posterUrl;
         this.synopsis = synopsis;
@@ -36,6 +41,11 @@ public class MovieDetails implements Parcelable {
     }
 
     private MovieDetails(Parcel in) {
+        if (in.readByte() == 0) {
+            rating = null;
+        } else {
+            id = in.readInt();
+        }
         title = in.readString();
         posterUrl = in.readString();
         synopsis = in.readString();
@@ -54,6 +64,12 @@ public class MovieDetails implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        if (id == null) {
+            parcel.writeByte((byte) 0);
+        } else {
+            parcel.writeByte((byte) 1);
+            parcel.writeInt(id);
+        }
         parcel.writeString(title);
         parcel.writeString(posterUrl);
         parcel.writeString(synopsis);
@@ -64,6 +80,14 @@ public class MovieDetails implements Parcelable {
             parcel.writeInt(rating);
         }
         parcel.writeString(releaseDate);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getTitle() {

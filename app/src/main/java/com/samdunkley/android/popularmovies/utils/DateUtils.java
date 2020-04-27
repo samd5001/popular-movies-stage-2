@@ -12,6 +12,7 @@ import java.util.Calendar;
 public class DateUtils {
 
     public static String getYearFromDateString(String date, Context context) {
+
         SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd");
 
         try {

@@ -32,7 +32,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MoviePosterHolder> {
         MovieDetails movieDetails = movieData.get(position);
         ImageView posterIv = holder.posterIv;
 
-        Picasso.get().load(movieDetails.getPosterUrl()).into(posterIv);
+        Picasso.get().load(movieDetails.getPosterUrl()).fit().into(posterIv);
     }
 
     @Override

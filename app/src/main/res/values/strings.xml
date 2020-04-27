@@ -2,10 +2,16 @@
     <string name="app_name">Popular Movies</string>
     <string name="main_title">Pop Movies</string>
     <string name="detail_title">Movie Detail</string>
-    <string name="sort_order_popular">Sort Order - Most Popular</string>
-    <string name="sort_order_top_rated">Sort Order - Top Rated</string>
+    <string name="sort_order_popular">Most Popular</string>
+    <string name="sort_order_top_rated">Top Rated</string>
+    <string name="sort_order_favourites">Favourites</string>
     <string name="detail_open_error_message">Error opening details for movie</string>
     <string name="detail_parse_date_error">Error parsing date for movie</string>
     <string name="detail_rating_template">%1$s/10</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="detail_name_placeholder">Movie Title</string>
+    <string name="detail_release_placeholder">2019</string>
+    <string name="detail_rating_placeholder">10/10</string>
+    <string name="detail_overview_placeholder">A descriptive overview for some movie</string>
 
 </resources>
