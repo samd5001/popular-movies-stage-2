@@ -56,7 +56,7 @@ public class ApiUtils {
             if (movieListJson == null)
                 return new ArrayList<>();
             JSONArray movieJsonArray = movieListJson.optJSONArray(RESULTS_JSON_KEY);
-            ArrayList<MovieDetails> arrayList = new ArrayList();
+            ArrayList<MovieDetails> arrayList = new ArrayList<>();
             if (movieJsonArray != null)
                 for (int i = 0; i < movieJsonArray.length(); i++) {
                     JSONObject movieDetailsJson = movieJsonArray.optJSONObject(i);
@@ -76,20 +76,14 @@ public class ApiUtils {
                     Request.Method.GET,
                     buildQueryUrl(movieId, activity.getApplicationContext()).toString(),
                     null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            MovieDetails movieDetails = createMovieDetailsFromJson(response);
-                            activity.setMovieDetails(movieDetails);
-                            activity.populateUI();
+                    response -> {
+                        MovieDetails movieDetails = createMovieDetailsFromJson(response);
+                        activity.setMovieDetails(movieDetails);
+                        activity.populateUI();
 
-                        }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
+                    error -> {
 
-                        }
                     });
 
             VolleyRequestSingleton.getInstance(activity.getApplicationContext()).addToRequestQueue(request);

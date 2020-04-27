@@ -19,6 +19,7 @@ import com.samdunkley.android.popularmovies.model.MovieDetails;
 import com.samdunkley.android.popularmovies.model.MovieFavourite;
 import com.samdunkley.android.popularmovies.utils.ApiUtils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,13 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<MovieFavourite> movieFavouritesList;
 
     private SharedPreferences prefs;
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(MOVIES_STATE_KEY, movieDetailsList);
-        outState.putParcelableArrayList(FAVOURITES_STATE_KEY, movieFavouritesList);
-        super.onSaveInstanceState(outState);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -92,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
         }
         prefs.edit().putString(SORT_PREFERENCE_KEY, sortOrder).commit();
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(MOVIES_STATE_KEY, movieDetailsList);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -182,7 +182,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setMoviesFromDB() {
-        movieDetailsList.clear();
+        if (movieDetailsList == null) {
+            movieDetailsList = new ArrayList<>();
+        } else {
+            movieDetailsList.clear();
+        }
+
         for (MovieFavourite favourite : movieFavouritesList) {
             movieDetailsList.add(new MovieDetails(favourite.getId(), favourite.getTitle(), favourite.getPosterPath(), null, null, null));
         }
@@ -192,14 +197,15 @@ public class MainActivity extends AppCompatActivity {
     private void loadFromSavedInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             movieDetailsList = new ArrayList<>();
-            movieFavouritesList = new ArrayList<>();
         } else {
-            populateStateArray(savedInstanceState, MOVIES_STATE_KEY, movieDetailsList);
-            populateStateArray(savedInstanceState, FAVOURITES_STATE_KEY, movieFavouritesList);
+            movieDetailsList = populateStateArray(savedInstanceState, MOVIES_STATE_KEY);
         }
+
+        movieFavouritesList = new ArrayList<>();
     }
 
-    private <T extends Parcelable> ArrayList<T> populateStateArray(Bundle savedInstanceState, String stateKey, ArrayList<T> movieList) {
+    private <T extends Parcelable> ArrayList<T> populateStateArray(Bundle savedInstanceState, String stateKey) {
+        ArrayList<T> movieList;
         if (!savedInstanceState.containsKey(stateKey)) {
             movieList = new ArrayList<>();
         } else {

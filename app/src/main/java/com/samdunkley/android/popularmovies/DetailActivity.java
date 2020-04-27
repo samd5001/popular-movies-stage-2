@@ -22,10 +22,13 @@ public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_MOVIE = "extra_movie";
     public static final String EXTRA_FAVOURITE = "extra_favourite";
+    private static final String MOVIE_STATE_KEY = "movie";
+    private static final String FAVOURITE_STATE_KEY ="isFavourite";
 
     private MovieFavouriteDatabase favouriteDb;
 
     private MovieDetails movieDetails;
+    private Boolean isFavourite;
 
     public void setMovieDetails(MovieDetails movieDetails) {
         this.movieDetails = movieDetails;
@@ -38,9 +41,15 @@ public class DetailActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        if (savedInstanceState != null) {
+            this.movieDetails = savedInstanceState.getParcelable(MOVIE_STATE_KEY);
+            this.isFavourite = savedInstanceState.getBoolean(FAVOURITE_STATE_KEY);
+            populateUI();
+            setupFavouriteButton(isFavourite);
+            return;
+        }
+
         Intent intent = getIntent();
-        boolean hasMov = intent.hasExtra(EXTRA_MOVIE);
-        boolean hasFav = intent.hasExtra(EXTRA_FAVOURITE);
 
         if (intent == null || (!intent.hasExtra((EXTRA_MOVIE)) && !intent.hasExtra((EXTRA_FAVOURITE)))) {
             closeOnError();
@@ -88,6 +97,13 @@ public class DetailActivity extends AppCompatActivity {
         overviewTv.setText(movieDetails.getSynopsis());
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(MOVIE_STATE_KEY, movieDetails);
+        outState.putBoolean(FAVOURITE_STATE_KEY, isFavourite);
+        super.onSaveInstanceState(outState);
+    }
+
     private void setTitleAndPoster(String title, String posterUrl) {
         TextView titleTv = findViewById(R.id.detail_title_tv);
         titleTv.setText(title);
@@ -98,14 +114,12 @@ public class DetailActivity extends AppCompatActivity {
 
     private void setupFavouriteButton(boolean isFavourite) {
         ToggleButton favouriteTb = findViewById(R.id.favourite_button);
+        this.isFavourite= isFavourite;
         favouriteTb.setChecked(isFavourite);
         setFavouriteButton(favouriteTb, isFavourite);
-        favouriteTb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton button, boolean checked) {
-                toggleFavourite(movieDetails, checked);
-                setFavouriteButton(favouriteTb, checked);
-            }
+        favouriteTb.setOnCheckedChangeListener((button, checked) -> {
+            toggleFavourite(movieDetails, checked);
+            setFavouriteButton(favouriteTb, checked);
         });
     }
 
