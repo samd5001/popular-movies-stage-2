@@ -9,7 +9,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/detail_title_tv"
@@ -50,7 +50,8 @@
                 android:id="@+id/detail_release_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="@dimen/spacing_4"
+                android:layout_marginLeft="@dimen/spacing_4"
                 android:layout_marginBottom="6dp"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -60,7 +61,8 @@
                 android:id="@+id/detail_rating_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="@dimen/spacing_4"
+                android:layout_marginLeft="@dimen/spacing_4"
                 android:textColor="@color/colorPrimaryDark"
                 tools:text="@string/detail_rating_placeholder" />
 
@@ -79,7 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="220dp"
-            android:padding="16dp"
+            android:padding="@dimen/spacing_16"
             app:layout_constraintTop_toBottomOf="@+id/detail_title_tv"
             tools:text="@string/detail_overview_placeholder" />
 
@@ -95,8 +97,8 @@
             android:id="@+id/trailer_header_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="@dimen/spacing_16"
+            android:layout_marginLeft="@dimen/spacing_16"
             android:text="@string/trailers"
             android:textSize="@dimen/trailer_header_text_size"
             android:textStyle="bold"
@@ -104,9 +106,10 @@
             app:layout_constraintTop_toBottomOf="@+id/trailer_divider" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:maxHeight="@dimen/detail_rv_max_height"
             android:id="@+id/trailer_rv"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:padding="8dp"
             android:scrollbars="vertical"
             app:layout_constraintTop_toBottomOf="@+id/trailer_header_tv" />
@@ -123,8 +126,8 @@
             android:id="@+id/review_header_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="@dimen/spacing_16"
+            android:layout_marginLeft="@dimen/spacing_16"
             android:text="@string/reviews_header"
             android:textSize="@dimen/trailer_header_text_size"
             android:textStyle="bold"
@@ -132,7 +135,7 @@
             app:layout_constraintTop_toBottomOf="@+id/review_divider" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:maxHeight="400dp"
+            android:maxHeight="@dimen/detail_rv_max_height"
             android:id="@+id/review_rv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

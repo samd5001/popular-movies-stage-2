@@ -9,4 +9,6 @@
     <dimen name="spacing_32">32dp</dimen>
     <dimen name="trailer_header_text_size">16sp</dimen>
     <dimen name="spacing_16">16dp</dimen>
+    <dimen name="detail_rv_max_height">400dp</dimen>
+    <dimen name="spacing_4">4dp</dimen>
 </resources>

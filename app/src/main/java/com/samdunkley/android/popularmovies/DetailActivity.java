@@ -106,7 +106,6 @@ public class DetailActivity extends AppCompatActivity {
             movieReviews = populateStateArray(savedInstanceState, REVIEWS_STATE_KEY);
             movieTrailers = populateStateArray(savedInstanceState, TRAILERS_STATE_KEY);
             setRecyclerViewsAdapters();
-
             populateUI();
             setupFavouriteButton(isFavourite);
             return;
@@ -123,7 +122,7 @@ public class DetailActivity extends AppCompatActivity {
                 movieDetails = intent.getParcelableExtra(EXTRA_MOVIE);
 
                 if (movieDetails != null) {
-                    setupFavouriteButton(false);
+                    DBExecutors.getInstance().diskIO().execute(this::checkFavouriteSet);
                     ApiUtils.fetchMovieReviews(movieDetails.getId().toString(), this);
                     ApiUtils.fetchMovieTrailers(movieDetails.getId().toString(), this);
                     populateUI();
@@ -136,9 +135,9 @@ public class DetailActivity extends AppCompatActivity {
 
                 if (favourite != null) {
                     setTitleAndPoster(favourite.getTitle(), favourite.getPosterPath());
-                    ApiUtils.fetchMovieReviews(movieDetails.getId().toString(), this);
-                    ApiUtils.fetchMovieTrailers(movieDetails.getId().toString(), this);
                     ApiUtils.fetchMovieAndPopulateUI(favourite.getId().toString(), this);
+                    ApiUtils.fetchMovieReviews(favourite.getId().toString(), this);
+                    ApiUtils.fetchMovieTrailers(favourite.getId().toString(), this);
                     setupFavouriteButton(true);
                     return;
                 }
@@ -244,5 +243,19 @@ public class DetailActivity extends AppCompatActivity {
             movieList = savedInstanceState.getParcelableArrayList(stateKey);
         }
         return movieList;
+    }
+
+    private void checkFavouriteSet() {
+        MovieFavourite favourite = favouriteDb.movieFavouriteDao().loadById(movieDetails.getId());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (favourite == null) {
+                    setupFavouriteButton(false);
+                } else {
+                    setupFavouriteButton(true);
+                }
+            }
+        });
     }
 }
