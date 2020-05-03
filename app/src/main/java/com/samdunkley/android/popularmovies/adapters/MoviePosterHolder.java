@@ -1,4 +1,4 @@
-package com.samdunkley.android.popularmovies;
+package com.samdunkley.android.popularmovies.adapters;
 
 import android.widget.ImageView;
 

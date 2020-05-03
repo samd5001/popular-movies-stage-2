@@ -13,5 +13,11 @@
     <string name="detail_release_placeholder">2019</string>
     <string name="detail_rating_placeholder">10/10</string>
     <string name="detail_overview_placeholder">A descriptive overview for some movie</string>
+    <string name="trailers">Trailers:</string>
+    <string name="reviews_header">Reviews:</string>
+    <string name="review_author">Author:</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nisl est, porta sed sodales sit amet, eleifend in tortor. Etiam ut faucibus erat. Nullam efficitur vestibulum turpis, consectetur malesuada leo. Praesent venenatis nibh non ligula aliquam rutrum. Mauris sollicitudin ligula et purus egestas, sed posuere justo maximus. Sed neque nunc, pharetra sollicitudin fermentum eu, condimentum id nunc. Curabitur ultricies metus eget mi convallis, in lobortis risus scelerisque. In pellentesque sollicitudin nisi a posuere. Donec consectetur, tortor id congue volutpat, ante nunc molestie sapien, id laoreet erat tellus vitae turpis. Phasellus maximus ex facilisis sollicitudin cursus. Nunc sit amet urna ante. Phasellus volutpat varius mi dapibus imperdiet. Nulla porttitor sem sed neque ultricies gravida. Sed eget risus venenatis, porttitor velit nec, hendrerit ante.</string>
+    <string name="youtube_watch_url">http://www.youtube.com/watch?v=</string>
+    <string name="youtube_app_url">vnd.youtube:</string>
 
 </resources>

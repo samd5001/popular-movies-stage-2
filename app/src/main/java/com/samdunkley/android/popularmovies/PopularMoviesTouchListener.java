@@ -5,14 +5,15 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MovieTouchListener implements RecyclerView.OnItemTouchListener {
+public class PopularMoviesTouchListener implements RecyclerView.OnItemTouchListener {
 
     private OnItemTouchListener mListener;
     private GestureDetector mGestureDetector;
 
-    public MovieTouchListener(Context context, final RecyclerView recyclerView, OnItemTouchListener listener) {
+    PopularMoviesTouchListener(Context context, OnItemTouchListener listener) {
         mListener = listener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -38,7 +39,7 @@ public class MovieTouchListener implements RecyclerView.OnItemTouchListener {
     }
 
     @Override
-    public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) {
+    public void onTouchEvent(@NonNull RecyclerView view, @NonNull MotionEvent motionEvent) {
     }
 
     @Override
@@ -46,6 +47,6 @@ public class MovieTouchListener implements RecyclerView.OnItemTouchListener {
     }
 
     public interface OnItemTouchListener {
-        public void onItemTouch(View view, int position);
+        void onItemTouch(View view, int position);
     }
 }

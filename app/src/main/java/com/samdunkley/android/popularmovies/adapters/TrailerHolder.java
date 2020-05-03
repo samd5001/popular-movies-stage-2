@@ -2,16 +2,22 @@ package com.samdunkley.android.popularmovies.adapters;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ReviewHolder extends RecyclerView.ViewHolder {
+import com.samdunkley.android.popularmovies.R;
 
-    View posterIv;
+public class TrailerHolder extends RecyclerView.ViewHolder {
 
-    ReviewHolder(@NonNull ImageView posterIv) {
-            super(posterIv);
-            this.posterIv = posterIv;
-        }
+    public ImageView thumbnailIv;
+    public TextView nameTv;
+
+
+    TrailerHolder(@NonNull View trailerView) {
+        super(trailerView);
+        this.thumbnailIv = trailerView.findViewById(R.id.trailer_thumbnail);
+        this.nameTv=trailerView.findViewById(R.id.trailer_name);
+    }
 }

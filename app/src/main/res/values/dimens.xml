@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="padding_38">38dp</dimen>
+    <dimen name="movie_text">52sp</dimen>
+    <dimen name="trailer_thumbnail_width">120dp</dimen>
+    <dimen name="trailer_thumbnail_height">90dp</dimen>
+    <dimen name="trailer_thumbnail_margin">16dp</dimen>
+    <dimen name="trailer_text">18sp</dimen>
+    <dimen name="spacing_32">32dp</dimen>
+    <dimen name="trailer_header_text_size">16sp</dimen>
+    <dimen name="spacing_16">16dp</dimen>
 </resources>

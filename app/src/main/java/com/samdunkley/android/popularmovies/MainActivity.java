@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,18 +13,17 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.samdunkley.android.popularmovies.adapters.MovieAdapter;
 import com.samdunkley.android.popularmovies.background.GetMovieDetailsListTask;
 import com.samdunkley.android.popularmovies.model.MovieDetails;
 import com.samdunkley.android.popularmovies.model.MovieFavourite;
 import com.samdunkley.android.popularmovies.utils.ApiUtils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String MOVIES_STATE_KEY = "movie_details";
-    private static final String FAVOURITES_STATE_KEY = "favourites_details";
     private static final String SORT_PREFERENCE_KEY = "sortOrder";
     private static final String POPULAR_API_PATH = "popular";
     private static final String TOP_RATED_API_PATH = "top_rated";
@@ -84,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             getAndSetMoviesFromApi(sortOrder);
         }
-        prefs.edit().putString(SORT_PREFERENCE_KEY, sortOrder).commit();
+        prefs.edit().putString(SORT_PREFERENCE_KEY, sortOrder).apply();
         return true;
     }
 
@@ -112,17 +110,13 @@ public class MainActivity extends AppCompatActivity {
         movieAdapter = new MovieAdapter(movieDetailsList);
         recyclerView.setAdapter(movieAdapter);
 
-        recyclerView.addOnItemTouchListener(new MovieTouchListener(this.getApplicationContext(), recyclerView, new MovieTouchListener.OnItemTouchListener() {
-                    @Override
-                    public void onItemTouch(View view, int position) {
-                        if (FAVOURITES.equals(getSortPathFromPreferences())) {
-                            launchDetailActivity(movieFavouritesList.get(position));
-                        } else {
-                            launchDetailActivity(movieDetailsList.get(position));
-                        }
-                    }
-                })
-        );
+        recyclerView.addOnItemTouchListener(new PopularMoviesTouchListener(this.getApplicationContext(), (view, position) -> {
+            if (FAVOURITES.equals(getSortPathFromPreferences())) {
+                launchDetailActivity(movieFavouritesList.get(position));
+            } else {
+                launchDetailActivity(movieDetailsList.get(position));
+            }
+        }));
     }
 
     @Override
@@ -182,11 +176,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setMoviesFromDB() {
-        if (movieDetailsList == null) {
-            movieDetailsList = new ArrayList<>();
-        } else {
+
             movieDetailsList.clear();
-        }
 
         for (MovieFavourite favourite : movieFavouritesList) {
             movieDetailsList.add(new MovieDetails(favourite.getId(), favourite.getTitle(), favourite.getPosterPath(), null, null, null));
@@ -195,23 +186,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadFromSavedInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIES_STATE_KEY)) {
             movieDetailsList = new ArrayList<>();
         } else {
-            movieDetailsList = populateStateArray(savedInstanceState, MOVIES_STATE_KEY);
-        }
+                movieDetailsList = savedInstanceState.getParcelableArrayList(MOVIES_STATE_KEY);
+            }
 
         movieFavouritesList = new ArrayList<>();
     }
-
-    private <T extends Parcelable> ArrayList<T> populateStateArray(Bundle savedInstanceState, String stateKey) {
-        ArrayList<T> movieList;
-        if (!savedInstanceState.containsKey(stateKey)) {
-            movieList = new ArrayList<>();
-        } else {
-            movieList = savedInstanceState.getParcelableArrayList(stateKey);
-        }
-        return movieList;
-    }
-
 }

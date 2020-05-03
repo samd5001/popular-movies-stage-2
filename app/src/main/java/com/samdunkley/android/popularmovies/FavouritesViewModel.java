@@ -21,7 +21,7 @@ public class FavouritesViewModel extends AndroidViewModel {
         favourites = db.movieFavouriteDao().loadFavourites();
     }
 
-    public LiveData<List<MovieFavourite>> getFavourites() {
+    LiveData<List<MovieFavourite>> getFavourites() {
         return favourites;
     }
 }

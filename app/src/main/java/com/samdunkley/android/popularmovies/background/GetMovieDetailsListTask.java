@@ -3,7 +3,7 @@ package com.samdunkley.android.popularmovies.background;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.samdunkley.android.popularmovies.MovieAdapter;
+import com.samdunkley.android.popularmovies.adapters.MovieAdapter;
 import com.samdunkley.android.popularmovies.model.MovieDetails;
 import com.samdunkley.android.popularmovies.utils.ApiUtils;
 

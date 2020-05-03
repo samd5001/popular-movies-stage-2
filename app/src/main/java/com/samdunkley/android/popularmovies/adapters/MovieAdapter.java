@@ -1,4 +1,4 @@
-package com.samdunkley.android.popularmovies;
+package com.samdunkley.android.popularmovies.adapters;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.samdunkley.android.popularmovies.R;
 import com.samdunkley.android.popularmovies.model.MovieDetails;
 import com.squareup.picasso.Picasso;
 
@@ -16,7 +17,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MoviePosterHolder> {
 
     private List<MovieDetails> movieData;
 
-    MovieAdapter(List<MovieDetails> movieData) {
+    public MovieAdapter(List<MovieDetails> movieData) {
         this.movieData = movieData;
     }
 
